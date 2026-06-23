@@ -5,6 +5,7 @@ import type { Match, MatchParticipant, TrackedUser } from "@/types/riot";
 import { userParticipations, kda, csPerMin, killParticipation } from "@/lib/analysis";
 import { championIcon } from "@/lib/assets";
 import { duration, kdaStr, num } from "@/lib/format";
+import { COPY, GUESS_RIGHT, GUESS_WRONG, pick } from "@/lib/humor";
 
 interface Round {
   user: TrackedUser;
@@ -33,6 +34,7 @@ export function GuessGame({
   const [guesses, setGuesses] = useState<string[]>([]);
   const [solved, setSolved] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
+  const [flavor, setFlavor] = useState("");
 
   const newRound = useCallback(() => {
     // En az 1 maçı olan oyuncular
@@ -54,6 +56,7 @@ export function GuessGame({
     setRound({ user, match, p, options });
     setGuesses([]);
     setSolved(false);
+    setFlavor("");
   }, [users, matches]);
 
   useEffect(() => {
@@ -77,19 +80,21 @@ export function GuessGame({
     setGuesses(nextGuesses);
     if (isCorrect) {
       setSolved(true);
+      setFlavor(pick(GUESS_RIGHT));
       setScore((s) => ({
         correct: s.correct + (nextGuesses.length === 1 ? 1 : 0),
         total: s.total + 1,
       }));
+    } else {
+      setFlavor(pick(GUESS_WRONG));
     }
   };
 
   return (
     <div>
-      <h2>Who is that AGAmon? 🕵️</h2>
+      <h2>{COPY.guessTitle}</h2>
       <p className="muted" style={{ marginTop: -8 }}>
-        Aşağıdaki flex 5v5 skoru hangi oyuncuya ait? Bilemezsen şampiyon ipucu
-        açılır. Skor: {score.correct}/{score.total} (ilk denemede).
+        {COPY.guessSub} Skor: {score.correct}/{score.total} (ilk denemede).
       </p>
 
       <div className="card" style={{ maxWidth: 480, margin: "0 auto" }}>
@@ -161,14 +166,14 @@ export function GuessGame({
           })}
         </div>
 
-        {guesses.length === 1 && !solved && (
+        {!solved && guesses.length > 0 && (
           <p className="loss" style={{ marginTop: 12 }}>
-            Yanlış! İpucu olarak şampiyon açıldı 👆
+            {flavor} {guesses.length === 1 && "(şampiyon ipucu açıldı 👆)"}
           </p>
         )}
         {solved && (
           <p className="win" style={{ marginTop: 12 }}>
-            Doğru — <strong>{user.gameName}</strong>, {p.championName} ile.
+            {flavor} <strong>{user.gameName}</strong>, {p.championName} ile.
           </p>
         )}
 

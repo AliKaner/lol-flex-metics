@@ -13,11 +13,11 @@ import { TeamBuilder } from "@/components/TeamBuilder";
 import { GuessGame } from "@/components/GuessGame";
 
 const TABS = [
-  { id: "report", label: "Şampiyon raporu" },
+  { id: "report", label: "Tanrı mı, besleme mi" },
   { id: "leaderboard", label: "Şampiyon sıralaması" },
-  { id: "combos", label: "Kombinasyonlar" },
-  { id: "connections", label: "Bağlantılar" },
-  { id: "highlights", label: "En iyi / kötü maçlar" },
+  { id: "combos", label: "Carry mi, sirk mi" },
+  { id: "connections", label: "Kim kimi taşıyor" },
+  { id: "highlights", label: "Efsane & utanç" },
   { id: "team", label: "Takım kurucu" },
   { id: "guess", label: "Who is that AGAmon" },
 ] as const;
@@ -43,7 +43,9 @@ export default function Home() {
       <h1 className="site-title">
         League <span>Map</span>
       </h1>
-      <p className="subtitle">Flex 5v5 maç analizi · takip ettiğin oyuncular</p>
+      <p className="subtitle">
+        Flex 5v5&apos;te kim tanrı kim besleme, ifşa zamanı.
+      </p>
 
       <UserManager />
 

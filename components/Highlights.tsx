@@ -5,6 +5,7 @@ import type { Match, MatchParticipant, TrackedUser } from "@/types/riot";
 import { ratedMatchesForUser, kda, killParticipation, csPerMin } from "@/lib/analysis";
 import { ChampBadge } from "./ChampBadge";
 import { duration, kdaStr, num, timeAgo } from "@/lib/format";
+import { COPY } from "@/lib/humor";
 
 function MatchRow({ match, p }: { match: Match; p: MatchParticipant }) {
   return (
@@ -56,7 +57,7 @@ export function Highlights({
 
   return (
     <div>
-      <h2>En iyi & en kötü maçlar</h2>
+      <h2>Efsane kareler & utanç müzesi</h2>
       <p className="muted" style={{ marginTop: -8 }}>
         Performans puanına göre (KDA, kill katılımı, CS/dk, sonuç, multikill).
         Sadece flex 5v5.
@@ -79,7 +80,10 @@ export function Highlights({
       ) : (
         <div className="grid cols-2">
           <div>
-            <h3 className="win">🏆 En iyi maçlar</h3>
+            <h3 className="win">{COPY.bestMatches}</h3>
+            <p className="muted" style={{ fontSize: 12, marginTop: -8 }}>
+              {COPY.bestMatchesSub}
+            </p>
             <div className="grid">
               {best.map((r) => (
                 <MatchRow key={r.match.metadata.matchId} match={r.match} p={r.p} />
@@ -87,7 +91,10 @@ export function Highlights({
             </div>
           </div>
           <div>
-            <h3 className="loss">💀 En kötü maçlar</h3>
+            <h3 className="loss">{COPY.worstMatches}</h3>
+            <p className="muted" style={{ fontSize: 12, marginTop: -8 }}>
+              {COPY.worstMatchesSub}
+            </p>
             <div className="grid">
               {worst.map((r) => (
                 <MatchRow key={r.match.metadata.matchId} match={r.match} p={r.p} />

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Match, TrackedUser } from "@/types/riot";
 import { pairSynergies, PairSynergy } from "@/lib/analysis";
+import { COPY } from "@/lib/humor";
 
 function liftStr(lift: number) {
   const sign = lift >= 0 ? "+" : "";
@@ -50,10 +51,11 @@ export function Connections({
 
   return (
     <div>
-      <h2>Bağlantılar / Sinerji</h2>
+      <h2>Kim kimi taşıyor, kim kimi batırıyor</h2>
       <p className="muted" style={{ marginTop: -8 }}>
-        Hangi ikililer birlikteyken takım winrate&apos;i artıyor ya da düşüyor.
-        Eğilim gösterir; maç sayısı her zaman belirtilir.
+        Hangi ikililer birlikteyken takım winrate&apos;i artıyor ya da dibe
+        vuruyor. Eğilim gösterir; maç sayısı her zaman belirtilir (suçu örnekleme
+        atmadan önce).
       </p>
 
       <label className="row" style={{ gap: 8, marginBottom: 16 }}>
@@ -70,7 +72,7 @@ export function Connections({
 
       <div className="grid cols-2">
         <div className="card">
-          <h3 className="win">↑ En güçlü pozitif sinerjiler</h3>
+          <h3 className="win">{COPY.positiveSynergy}</h3>
           {positive.length === 0 ? (
             <p className="muted">Pozitif sinerji bulunamadı.</p>
           ) : (
@@ -82,7 +84,7 @@ export function Connections({
           )}
         </div>
         <div className="card">
-          <h3 className="loss">↓ Winrate düşüren ikililer</h3>
+          <h3 className="loss">{COPY.negativeSynergy}</h3>
           {negative.length === 0 ? (
             <p className="muted">Negatif sinerji bulunamadı.</p>
           ) : (

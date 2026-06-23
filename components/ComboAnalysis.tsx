@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { Match, TrackedUser } from "@/types/riot";
 import { comboStats } from "@/lib/analysis";
 import { pct } from "@/lib/format";
+import { COPY } from "@/lib/humor";
 
 export function ComboAnalysis({
   users,
@@ -41,10 +42,11 @@ export function ComboAnalysis({
 
   return (
     <div>
-      <h2>Kombinasyon analizi</h2>
+      <h2>Hangi kadro carry, hangisi sirk</h2>
       <p className="muted" style={{ marginTop: -8 }}>
-        Eklenen oyuncuların tüm {size}&apos;li kombinasyonları arasından,{" "}
-        <strong>aynı takımda birlikte oynadıkları</strong> flex 5v5 maçları.
+        {COPY.comboSub} Eklenen oyuncuların tüm {size}&apos;li kombinasyonları
+        arasından, <strong>aynı takımda birlikte oynadıkları</strong> flex 5v5
+        maçları.
       </p>
 
       <div className="row" style={{ marginBottom: 16 }}>

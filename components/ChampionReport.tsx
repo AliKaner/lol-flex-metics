@@ -4,6 +4,7 @@ import type { Match, TrackedUser } from "@/types/riot";
 import { userChampReport, ChampStat } from "@/lib/analysis";
 import { ChampBadge } from "./ChampBadge";
 import { num, pct } from "@/lib/format";
+import { COPY, wrRoast } from "@/lib/humor";
 
 function ChampMini({ label, stat, good }: { label: string; stat?: ChampStat; good: boolean }) {
   if (!stat)
@@ -24,6 +25,9 @@ function ChampMini({ label, stat, good }: { label: string; stat?: ChampStat; goo
         small
         sub={`${pct(stat.winRate)} WR · ${num(stat.avgKda, 2)} KDA · ${stat.games} maç`}
       />
+      <div className="muted" style={{ fontSize: 11, marginTop: 4 }}>
+        “{wrRoast(stat.winRate, stat.games)}”
+      </div>
     </div>
   );
 }
@@ -39,7 +43,7 @@ export function ChampionReport({
 
   return (
     <div>
-      <h2>Oyuncu bazlı en iyi / en kötü şampiyonlar</h2>
+      <h2>Kim neyle tanrı, kim neyle besleme</h2>
       <p className="muted" style={{ marginTop: -8 }}>
         Winrate'e göre (en az 2 maç oynanan şampiyonlar arasından).
       </p>
@@ -61,8 +65,8 @@ export function ChampionReport({
                 flexWrap: "wrap",
               }}
             >
-              <ChampMini label="EN İYİ" stat={r.best} good />
-              <ChampMini label="EN KÖTÜ" stat={r.worst} good={false} />
+              <ChampMini label={COPY.bestChamp} stat={r.best} good />
+              <ChampMini label={COPY.worstChamp} stat={r.worst} good={false} />
             </div>
             {r.champs.length > 0 && (
               <details style={{ marginTop: 12 }}>
