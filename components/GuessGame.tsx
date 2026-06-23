@@ -187,10 +187,23 @@ export function GuessGame({
                 ? (revealChamp ? p.championName : t("guessGame.hiddenChamp"))
                 : (revealPlayer ? `${user.gameName}#${user.tagLine}` : t("guessGame.hiddenPlayer"))}
             </div>
-            <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
-              {p.teamPosition || "—"} · {duration(match.info.gameDuration)} ·{" "}
-              <span className={p.win ? "win" : "loss"} style={{ fontWeight: 700 }}>
-                {p.win ? t("highlights.victoryLabel") : t("highlights.defeatLabel")}
+            <div style={{ marginTop: 4 }}>
+              <span className="badge" style={{
+                fontSize: 12,
+                fontWeight: 800,
+                padding: "4px 12px",
+                color: "var(--accent-3)",
+                borderColor: "var(--accent)",
+                background: "rgba(200, 155, 60, 0.1)",
+                marginRight: 8,
+              }}>
+                {(p.teamPosition || "—").replace("UTILITY", "SUPPORT")}
+              </span>
+              <span className="muted" style={{ fontSize: 12 }}>
+                {duration(match.info.gameDuration)} ·{" "}
+                <span className={p.win ? "win" : "loss"} style={{ fontWeight: 700 }}>
+                  {p.win ? t("highlights.victoryLabel") : t("highlights.defeatLabel")}
+                </span>
               </span>
             </div>
           </div>

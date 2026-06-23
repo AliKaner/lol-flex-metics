@@ -7,8 +7,9 @@ import { GuessGame } from "@/components/GuessGame";
 import { MatchMatcher } from "@/components/MatchMatcher";
 import { DamageDuel } from "@/components/DamageDuel";
 import { TournamentGame } from "@/components/TournamentGame";
+import { YuumiShame } from "@/components/YuumiShame";
 
-type GameMode = "lobby" | "guess_player" | "guess_champ" | "matcher" | "duel" | "tournament";
+type GameMode = "lobby" | "guess_player" | "guess_champ" | "matcher" | "duel" | "tournament" | "yuumi_shame";
 
 export function GamesHub({
   users,
@@ -67,7 +68,16 @@ export function GamesHub({
             </p>
           </div>
 
-          {/* Card 5: Tournament Mode */}
+          {/* Card 5: Yuumi Shame */}
+          <div className="card game-select-card" onClick={() => setMode("yuumi_shame")} style={{ cursor: "pointer" }}>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>🐱</div>
+            <h3 style={{ margin: 0, color: "var(--accent)" }}>{t("gamesHub.yuumiTitle")}</h3>
+            <p className="muted" style={{ fontSize: 13, marginTop: 6, marginBottom: 0 }}>
+              {t("gamesHub.yuumiDesc")}
+            </p>
+          </div>
+
+          {/* Card 6: Tournament Mode */}
           <div
             className="card game-select-card"
             onClick={() => setMode("tournament")}
@@ -108,6 +118,9 @@ export function GamesHub({
         )}
         {mode === "duel" && (
           <DamageDuel users={users} matches={matches} />
+        )}
+        {mode === "yuumi_shame" && (
+          <YuumiShame users={users} matches={matches} />
         )}
         {mode === "tournament" && (
           <TournamentGame users={users} matches={matches} />

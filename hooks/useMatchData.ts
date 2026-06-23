@@ -20,15 +20,16 @@ export interface MatchData {
 export function useMatchData(
   users: TrackedUser[],
   matchCount = 40,
-  startTime?: number
+  startTime?: number,
+  endTime?: number
 ): MatchData {
   // 1) Her kullanıcının maç ID listesi
   const idQueries = useQueries({
     queries: users.map((u) => ({
-      queryKey: ["matchIds", u.puuid, matchCount, startTime],
-      queryFn: () => getFlexMatchIds(u.region, u.puuid, matchCount, startTime),
+      queryKey: ["matchIds", u.puuid, matchCount, startTime, endTime],
+      queryFn: () => getFlexMatchIds(u.region, u.puuid, matchCount, startTime, endTime),
       enabled: !!u.puuid,
-      staleTime: Infinity, // Sadece kullanıcı manuel yenilediğinde istek atar
+      staleTime: Infinity,
     })),
   });
 

@@ -18,15 +18,19 @@ import { FunFacts } from "@/components/FunFacts";
 import { PlayerOfTheDay } from "@/components/PlayerOfTheDay";
 import { ShameWall } from "@/components/ShameWall";
 import { DreamTeam } from "@/components/DreamTeam";
+import { StatLeaders } from "@/components/StatLeaders";
 import { useTranslation } from "@/lib/i18n";
+import { SEASONS, CURRENT_SEASON } from "@/lib/seasons";
+import { usePrefetchSeasons } from "@/hooks/usePrefetchSeasons";
 
-type TabId = "report" | "leaderboard" | "combos" | "connections" | "highlights" | "team" | "games" | "trends" | "dreamteam";
+type TabId = "report" | "leaderboard" | "combos" | "connections" | "highlights" | "team" | "games" | "trends" | "dreamteam" | "stats";
 
 export default function Home() {
   const { t, lang, setLang } = useTranslation();
   const users = useUsers();
   const [tab, setTab] = useState<TabId>("report");
-  const [timeRange, setTimeRange] = useState<"today" | "all">("all");
+  const [seasonId, setSeasonId] = useState(CURRENT_SEASON.id);
+  const [todayOnly, setTodayOnly] = useState(false);
   const matchCount = 100;
 
   const queryClient = useQueryClient();
@@ -86,20 +90,30 @@ export default function Home() {
     reader.readAsText(file);
   };
 
+  const selectedSeason = SEASONS.find((s) => s.id === seasonId) || CURRENT_SEASON;
+
   const startTime = useMemo(() => {
-    if (timeRange === "today") {
+    if (todayOnly) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       return Math.floor(today.getTime() / 1000);
     }
-    return Math.floor(new Date("2026-01-08T00:00:00Z").getTime() / 1000);
-  }, [timeRange]);
+    return selectedSeason.startTime;
+  }, [todayOnly, selectedSeason]);
+
+  const endTime = useMemo(() => {
+    if (todayOnly) return undefined;
+    return selectedSeason.endTime;
+  }, [todayOnly, selectedSeason]);
 
   const { matches, isLoading, loaded, total, error } = useMatchData(
     users,
     matchCount,
-    startTime
+    startTime,
+    endTime
   );
+
+  usePrefetchSeasons(users, seasonId);
 
   const hasUsers = users.length > 0;
   const needsData = tab !== "team";
@@ -114,6 +128,7 @@ export default function Home() {
     { id: "games", label: t("page.tabs.games") },
     { id: "trends", label: t("page.tabs.trends") },
     { id: "dreamteam", label: t("page.tabs.dreamteam") },
+    { id: "stats", label: t("page.tabs.stats") },
   ] as const;
 
   return (
@@ -161,14 +176,26 @@ export default function Home() {
             <div className="row" style={{ justifyContent: "space-between" }}>
               <div className="row" style={{ gap: 12 }}>
                 <label className="row" style={{ gap: 8 }}>
-                  <span className="muted" style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("page.timeRange")}</span>
+                  <span className="muted" style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("page.season")}</span>
                   <select
-                    value={timeRange}
-                    onChange={(e) => setTimeRange(e.target.value as "today" | "all")}
+                    value={seasonId}
+                    onChange={(e) => { setSeasonId(e.target.value); setTodayOnly(false); }}
                   >
-                    <option value="all">{t("page.allTime")}</option>
-                    <option value="today">{t("page.today")}</option>
+                    {SEASONS.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {lang === "tr" ? s.labelTr : s.labelEn}
+                      </option>
+                    ))}
                   </select>
+                </label>
+                <label className="row" style={{ gap: 6 }}>
+                  <input
+                    type="checkbox"
+                    checked={todayOnly}
+                    onChange={(e) => setTodayOnly(e.target.checked)}
+                    style={{ width: 16 }}
+                  />
+                  <span className="muted" style={{ fontSize: 12 }}>{t("page.today")}</span>
                 </label>
                 <button
                   onClick={handleRefresh}
@@ -274,6 +301,7 @@ export default function Home() {
               {tab === "games" && <GamesHub users={users} matches={matches} />}
               {tab === "trends" && <TrendAnalysis users={users} matches={matches} />}
               {tab === "dreamteam" && <DreamTeam users={users} matches={matches} />}
+              {tab === "stats" && <StatLeaders users={users} matches={matches} />}
             </>
           )}
         </>

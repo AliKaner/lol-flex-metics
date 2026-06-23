@@ -119,8 +119,9 @@ async function queuedFetch<T>(fn: () => Promise<T>): Promise<T> {
 export async function getFlexMatchIds(
   region: string,
   puuid: string,
-  count = 100, // Bu parametre artık geriye dönük uyumluluk için var, döngüyle tümünü çekeceğiz
-  startTime?: number
+  count = 100,
+  startTime?: number,
+  endTime?: number
 ): Promise<string[]> {
   let allIds: string[] = [];
   let start = 0;
@@ -130,6 +131,9 @@ export async function getFlexMatchIds(
     let url = `lol/match/v5/matches/by-puuid/${puuid}/ids?queue=${QUEUE_FLEX_5V5}&type=ranked&start=${start}&count=${batchSize}`;
     if (startTime) {
       url += `&startTime=${startTime}`;
+    }
+    if (endTime) {
+      url += `&endTime=${endTime}`;
     }
 
     const ids = await riotFetch<string[]>(region, url);
