@@ -13,9 +13,14 @@ import { Highlights } from "@/components/Highlights";
 import { TeamBuilder } from "@/components/TeamBuilder";
 import { GamesHub } from "@/components/GamesHub";
 import { TrendAnalysis } from "@/components/TrendAnalysis";
+import { QuickStats } from "@/components/QuickStats";
+import { FunFacts } from "@/components/FunFacts";
+import { PlayerOfTheDay } from "@/components/PlayerOfTheDay";
+import { ShameWall } from "@/components/ShameWall";
+import { DreamTeam } from "@/components/DreamTeam";
 import { useTranslation } from "@/lib/i18n";
 
-type TabId = "report" | "leaderboard" | "combos" | "connections" | "highlights" | "team" | "games" | "trends";
+type TabId = "report" | "leaderboard" | "combos" | "connections" | "highlights" | "team" | "games" | "trends" | "dreamteam";
 
 export default function Home() {
   const { t, lang, setLang } = useTranslation();
@@ -56,6 +61,18 @@ export default function Home() {
       try {
         const backup = JSON.parse(event.target?.result as string);
         if (backup && backup.users && backup.cache) {
+          const now = Date.now();
+          if (backup.cache.timestamp) {
+            backup.cache.timestamp = now;
+          }
+          if (backup.cache.clientState?.queries) {
+            backup.cache.clientState.queries.forEach((q: any) => {
+              if (q.state) {
+                q.state.dataUpdatedAt = now;
+                q.state.errorUpdatedAt = 0;
+              }
+            });
+          }
           window.localStorage.setItem("league-map-users", JSON.stringify(backup.users));
           window.localStorage.setItem("league-map-cache", JSON.stringify(backup.cache));
           window.location.reload();
@@ -75,7 +92,6 @@ export default function Home() {
       today.setHours(0, 0, 0, 0);
       return Math.floor(today.getTime() / 1000);
     }
-    // Season 2026 Start: Jan 8, 2026
     return Math.floor(new Date("2026-01-08T00:00:00Z").getTime() / 1000);
   }, [timeRange]);
 
@@ -86,7 +102,6 @@ export default function Home() {
   );
 
   const hasUsers = users.length > 0;
-  // Takım kurucu maç verisi gerektirmez.
   const needsData = tab !== "team";
 
   const tabs = [
@@ -98,31 +113,38 @@ export default function Home() {
     { id: "team", label: t("page.tabs.team") },
     { id: "games", label: t("page.tabs.games") },
     { id: "trends", label: t("page.tabs.trends") },
+    { id: "dreamteam", label: t("page.tabs.dreamteam") },
   ] as const;
 
   return (
     <div className="container">
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <h1 className="site-title" style={{ margin: 0 }}>
-          {t("page.siteTitle")} <span>{t("page.siteTitleSpan")}</span>
-        </h1>
+      {/* Header */}
+      <div className="site-header">
+        <div className="row" style={{ gap: 14, alignItems: "center" }}>
+          <img
+            src="/logo.png"
+            alt="lol-flex-metics logo"
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "6px",
+              border: "2px solid var(--accent)",
+              boxShadow: "0 0 15px rgba(200, 155, 60, 0.4)",
+            }}
+          />
+          <h1 className="site-title" style={{ margin: 0 }}>
+            {t("page.siteTitle")} <span>{t("page.siteTitleSpan")}</span>
+          </h1>
+        </div>
         <button
+          className="lang-toggle"
           onClick={() => setLang(lang === "tr" ? "en" : "tr")}
-          style={{
-            padding: "6px 12px",
-            fontSize: "12px",
-            background: "var(--panel-2)",
-            color: "var(--text)",
-            border: "1px solid var(--border)",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
         >
-          {lang === "tr" ? "🇺🇸 EN" : "🇹🇷 TR"}
+          {lang === "tr" ? "EN" : "TR"}
         </button>
       </div>
-      <p className="subtitle" style={{ marginTop: -10 }}>
+
+      <p className="subtitle">
         {t("page.subtitle")}
       </p>
 
@@ -134,11 +156,12 @@ export default function Home() {
         </div>
       ) : (
         <>
+          {/* Controls Panel */}
           <div className="panel">
             <div className="row" style={{ justifyContent: "space-between" }}>
-              <div className="row" style={{ gap: 16 }}>
+              <div className="row" style={{ gap: 12 }}>
                 <label className="row" style={{ gap: 8 }}>
-                  <span className="muted">{t("page.timeRange")}</span>
+                  <span className="muted" style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("page.timeRange")}</span>
                   <select
                     value={timeRange}
                     onChange={(e) => setTimeRange(e.target.value as "today" | "all")}
@@ -150,41 +173,33 @@ export default function Home() {
                 <button
                   onClick={handleRefresh}
                   disabled={isLoading}
-                  style={{
-                    padding: "6px 12px",
-                    fontSize: "12px",
-                    background: "var(--accent-2)",
-                    color: "#021014",
-                    borderRadius: "6px"
-                  }}
+                  style={{ fontSize: 11 }}
                 >
                   {isLoading ? t("page.refreshing") : t("page.refresh")}
                 </button>
                 <button
+                  className="ghost"
                   onClick={handleExport}
-                  style={{
-                    padding: "6px 12px",
-                    fontSize: "12px",
-                    background: "var(--panel-2)",
-                    color: "var(--text)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "6px"
-                  }}
                   title={t("page.exportTitle")}
+                  style={{ fontSize: 11 }}
                 >
                   {t("page.export")}
                 </button>
                 <label
                   style={{
-                    padding: "6px 12px",
-                    fontSize: "12px",
-                    background: "var(--panel-2)",
+                    padding: "10px 16px",
+                    fontSize: "11px",
+                    background: "transparent",
                     color: "var(--text)",
                     border: "1px solid var(--border)",
-                    borderRadius: "6px",
+                    borderRadius: "var(--radius-sm)",
                     cursor: "pointer",
                     display: "inline-flex",
-                    alignItems: "center"
+                    alignItems: "center",
+                    fontWeight: 600,
+                    transition: "var(--transition)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.04em",
                   }}
                   title={t("page.importTitle")}
                 >
@@ -197,7 +212,7 @@ export default function Home() {
                   />
                 </label>
               </div>
-              <span className="muted">
+              <span className="muted" style={{ fontSize: 12 }}>
                 {isLoading
                   ? t("page.loadingMatches", { loaded, total })
                   : t("page.matchesLoaded", { count: matches.length })}
@@ -209,12 +224,27 @@ export default function Home() {
               </div>
             )}
             {error && (
-              <p className="loss" style={{ marginTop: 8 }}>
+              <p className="loss" style={{ marginTop: 8, fontSize: 12 }}>
                 {error} — {t("page.apiExpired")}
               </p>
             )}
           </div>
 
+          {/* Quick Stats Banner */}
+          {matches.length > 0 && (
+            <QuickStats users={users} matches={matches} />
+          )}
+
+          {/* Player of the Day + Fun Facts + Shame Wall */}
+          {matches.length > 0 && (
+            <>
+              <PlayerOfTheDay users={users} matches={matches} />
+              <FunFacts users={users} matches={matches} />
+              <ShameWall users={users} matches={matches} />
+            </>
+          )}
+
+          {/* Tabs */}
           <div className="tabs">
             {tabs.map((t) => (
               <button
@@ -243,12 +273,13 @@ export default function Home() {
               {tab === "team" && <TeamBuilder users={users} />}
               {tab === "games" && <GamesHub users={users} matches={matches} />}
               {tab === "trends" && <TrendAnalysis users={users} matches={matches} />}
+              {tab === "dreamteam" && <DreamTeam users={users} matches={matches} />}
             </>
           )}
         </>
       )}
 
-      <footer className="muted" style={{ marginTop: 40, fontSize: 12 }}>
+      <footer className="muted" style={{ marginTop: 40, fontSize: 11, letterSpacing: "0.02em" }}>
         {t("page.footer")}
       </footer>
     </div>

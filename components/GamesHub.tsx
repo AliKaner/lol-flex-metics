@@ -6,8 +6,9 @@ import { useTranslation } from "@/lib/i18n";
 import { GuessGame } from "@/components/GuessGame";
 import { MatchMatcher } from "@/components/MatchMatcher";
 import { DamageDuel } from "@/components/DamageDuel";
+import { TournamentGame } from "@/components/TournamentGame";
 
-type GameMode = "lobby" | "guess_player" | "guess_champ" | "matcher" | "duel";
+type GameMode = "lobby" | "guess_player" | "guess_champ" | "matcher" | "duel" | "tournament";
 
 export function GamesHub({
   users,
@@ -65,6 +66,19 @@ export function GamesHub({
               {t("gamesHub.duelDesc")}
             </p>
           </div>
+
+          {/* Card 5: Tournament Mode */}
+          <div
+            className="card game-select-card"
+            onClick={() => setMode("tournament")}
+            style={{ cursor: "pointer", gridColumn: "1 / -1" }}
+          >
+            <div style={{ fontSize: 32, marginBottom: 8 }}>🏆</div>
+            <h3 style={{ margin: 0, color: "var(--accent)" }}>{t("gamesHub.tournamentTitle")}</h3>
+            <p className="muted" style={{ fontSize: 13, marginTop: 6, marginBottom: 0 }}>
+              {t("gamesHub.tournamentDesc")}
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -94,6 +108,9 @@ export function GamesHub({
         )}
         {mode === "duel" && (
           <DamageDuel users={users} matches={matches} />
+        )}
+        {mode === "tournament" && (
+          <TournamentGame users={users} matches={matches} />
         )}
       </div>
     </div>
