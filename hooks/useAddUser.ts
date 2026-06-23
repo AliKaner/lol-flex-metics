@@ -6,10 +6,13 @@ import { regionForPlatform } from "@/lib/regions";
 import { usersStore } from "@/lib/usersStore";
 import type { RiotAccount, TrackedUser } from "@/types/riot";
 
-// "Name#TAG" + platform -> puuid çözer ve store'a ekler.
+import { useTranslation } from "@/lib/i18n";
+
+// "Name#TAG" + platform -> puuid çözer and store'a ekler.
 // Account sorgusu cachelenir; aynı Riot ID için tekrar istek atılmaz.
 export function useAddUser() {
   const qc = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: async ({
@@ -22,7 +25,7 @@ export function useAddUser() {
       const trimmed = riotId.trim();
       const hashIdx = trimmed.lastIndexOf("#");
       if (hashIdx < 1 || hashIdx === trimmed.length - 1) {
-        throw new Error('Geçersiz Riot ID. Format: "İsim#TAG" (örn: Faker#KR1)');
+        throw new Error(t("userManager.invalidRiotId"));
       }
       const gameName = trimmed.slice(0, hashIdx);
       const tagLine = trimmed.slice(hashIdx + 1);

@@ -5,7 +5,8 @@ import type { Match, MatchParticipant, TrackedUser } from "@/types/riot";
 import { userParticipations, kda, csPerMin, killParticipation } from "@/lib/analysis";
 import { championIcon } from "@/lib/assets";
 import { duration, kdaStr, num } from "@/lib/format";
-import { COPY, GUESS_RIGHT, GUESS_WRONG, pick } from "@/lib/humor";
+import { useTranslation } from "@/lib/i18n";
+import { translations } from "@/lib/translations";
 
 interface Round {
   user: TrackedUser;
@@ -23,6 +24,10 @@ function shuffle<T>(a: T[]): T[] {
   return r;
 }
 
+function pick<T>(arr: readonly T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 export function GuessGame({
   users,
   matches,
@@ -30,11 +35,15 @@ export function GuessGame({
   users: TrackedUser[];
   matches: Match[];
 }) {
+  const { t, lang } = useTranslation();
   const [round, setRound] = useState<Round | null>(null);
   const [guesses, setGuesses] = useState<string[]>([]);
   const [solved, setSolved] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [flavor, setFlavor] = useState("");
+
+  const rightReplies = translations[lang].guessGame.rightReplies;
+  const wrongReplies = translations[lang].guessGame.wrongReplies;
 
   const newRound = useCallback(() => {
     // En az 1 maçı olan oyuncular
@@ -66,7 +75,7 @@ export function GuessGame({
   if (!round)
     return (
       <div className="empty">
-        Bu oyun için en az 2 oyuncunun maç verisi gerekiyor.
+        {t("guessGame.notEnoughUsersGuess")}
       </div>
     );
 
@@ -80,21 +89,21 @@ export function GuessGame({
     setGuesses(nextGuesses);
     if (isCorrect) {
       setSolved(true);
-      setFlavor(pick(GUESS_RIGHT));
+      setFlavor(pick(rightReplies));
       setScore((s) => ({
         correct: s.correct + (nextGuesses.length === 1 ? 1 : 0),
         total: s.total + 1,
       }));
     } else {
-      setFlavor(pick(GUESS_WRONG));
+      setFlavor(pick(wrongReplies));
     }
   };
 
   return (
     <div>
-      <h2>{COPY.guessTitle}</h2>
+      <h2>{t("guessGame.title")}</h2>
       <p className="muted" style={{ marginTop: -8 }}>
-        {COPY.guessSub} Skor: {score.correct}/{score.total} (ilk denemede).
+        {t("guessGame.subtitle")} {t("guessGame.scoreLabel")} {score.correct}/{score.total} {t("guessGame.firstTryOnly")}.
       </p>
 
       <div className="card" style={{ maxWidth: 480, margin: "0 auto" }}>
@@ -124,12 +133,12 @@ export function GuessGame({
           )}
           <div>
             <div style={{ fontWeight: 700, fontSize: 18 }}>
-              {revealChamp ? p.championName : "Gizli şampiyon"}
+              {revealChamp ? p.championName : t("guessGame.hiddenChamp")}
             </div>
             <div className="muted">
               {p.teamPosition || "—"} · {duration(match.info.gameDuration)} ·{" "}
               <span className={p.win ? "win" : "loss"}>
-                {p.win ? "Galibiyet" : "Mağlubiyet"}
+                {p.win ? t("highlights.victoryLabel") : t("highlights.defeatLabel")}
               </span>
             </div>
           </div>
@@ -139,12 +148,12 @@ export function GuessGame({
           <Stat label="KDA" value={kdaStr(p)} sub={`${num(kda(p), 2)}`} />
           <Stat label="KP" value={`${Math.round(killParticipation(match, p) * 100)}%`} />
           <Stat label="CS/dk" value={num(csPerMin(match, p), 1)} />
-          <Stat label="Hasar" value={p.totalDamageDealtToChampions.toLocaleString("tr")} />
-          <Stat label="Vision" value={String(p.visionScore)} />
-          <Stat label="Level" value={String(p.champLevel)} />
+          <Stat label="Hasar" value={p.totalDamageDealtToChampions.toLocaleString(lang)} />
+          <Stat label={t("guessGame.vision")} value={String(p.visionScore)} />
+          <Stat label={t("guessGame.level")} value={String(p.champLevel)} />
         </div>
 
-        <h3 style={{ marginTop: 16 }}>Kim bu?</h3>
+        <h3 style={{ marginTop: 16 }}>{t("guessGame.guessWho")}</h3>
         <div className="kbd-options">
           {options.map((o) => {
             const guessed = guesses.includes(o.puuid);
@@ -168,12 +177,12 @@ export function GuessGame({
 
         {!solved && guesses.length > 0 && (
           <p className="loss" style={{ marginTop: 12 }}>
-            {flavor} {guesses.length === 1 && "(şampiyon ipucu açıldı 👆)"}
+            {flavor} {guesses.length === 1 && `(${t("guessGame.champHint")})`}
           </p>
         )}
         {solved && (
           <p className="win" style={{ marginTop: 12 }}>
-            {flavor} <strong>{user.gameName}</strong>, {p.championName} ile.
+            {flavor} <strong>{user.gameName}</strong>, {t("guessGame.withChamp")} {p.championName}.
           </p>
         )}
 
@@ -182,7 +191,7 @@ export function GuessGame({
           style={{ marginTop: 14, width: "100%" }}
           onClick={newRound}
         >
-          {solved ? "Sıradaki ▶" : "Pas geç / Yeni"}
+          {solved ? t("guessGame.nextRound") : t("guessGame.skipRound")}
         </button>
       </div>
     </div>

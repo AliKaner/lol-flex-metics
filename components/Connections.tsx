@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Match, TrackedUser } from "@/types/riot";
 import { pairSynergies, PairSynergy } from "@/lib/analysis";
-import { COPY } from "@/lib/humor";
+import { useTranslation } from "@/lib/i18n";
 
 function liftStr(lift: number) {
   const sign = lift >= 0 ? "+" : "";
@@ -11,18 +11,18 @@ function liftStr(lift: number) {
 }
 
 function Sentence({ s }: { s: PairSynergy }) {
+  const { t } = useTranslation();
   const up = s.lift >= 0;
   return (
     <li style={{ marginBottom: 8 }}>
-      <strong>{s.a.gameName}</strong> + <strong>{s.b.gameName}</strong> birlikte
-      olunca winrate{" "}
+      <strong>{s.a.gameName}</strong> + <strong>{s.b.gameName}</strong> {t("connections.togetherText")}{" "}
       <span className={up ? "win" : "loss"} style={{ fontWeight: 700 }}>
         {liftStr(s.lift)}
       </span>{" "}
-      {up ? "artıyor" : "düşüyor"}{" "}
+      {up ? t("connections.liftUp") : t("connections.liftDown")}{" "}
       <span className="muted">
-        ({s.games} maç, birlikte {(s.togetherWR * 100).toFixed(0)}% WR
-        {!s.enough && " · az örneklem"})
+        ({s.games} {t("connections.matchesLabel")}, {t("connections.togetherWRLabel")} {(s.togetherWR * 100).toFixed(0)}% WR
+        {!s.enough && ` · ${t("connections.notEnoughMatches")}`})
       </span>
     </li>
   );
@@ -35,6 +35,7 @@ export function Connections({
   users: TrackedUser[];
   matches: Match[];
 }) {
+  const { t } = useTranslation();
   const [minGames, setMinGames] = useState(3);
   const all = useMemo(
     () => pairSynergies(users, matches, minGames),
@@ -42,7 +43,7 @@ export function Connections({
   );
 
   if (users.length < 2)
-    return <div className="empty">Bağlantı analizi için en az 2 oyuncu ekle.</div>;
+    return <div className="empty">{t("connections.emptyConnections")}</div>;
 
   const enough = all.filter((s) => s.enough);
   const pool = enough.length > 0 ? enough : all;
@@ -51,15 +52,13 @@ export function Connections({
 
   return (
     <div>
-      <h2>Kim kimi taşıyor, kim kimi batırıyor</h2>
+      <h2>{t("connections.title")}</h2>
       <p className="muted" style={{ marginTop: -8 }}>
-        Hangi ikililer birlikteyken takım winrate&apos;i artıyor ya da dibe
-        vuruyor. Eğilim gösterir; maç sayısı her zaman belirtilir (suçu örnekleme
-        atmadan önce).
+        {t("connections.subtitle")}
       </p>
 
       <label className="row" style={{ gap: 8, marginBottom: 16 }}>
-        <span className="muted">Min. birlikte maç:</span>
+        <span className="muted">{t("connections.minMatches")}</span>
         <input
           type="number"
           min={1}
@@ -72,9 +71,9 @@ export function Connections({
 
       <div className="grid cols-2">
         <div className="card">
-          <h3 className="win">{COPY.positiveSynergy}</h3>
+          <h3 className="win">{t("connections.positiveSynergy")}</h3>
           {positive.length === 0 ? (
-            <p className="muted">Pozitif sinerji bulunamadı.</p>
+            <p className="muted">{t("connections.noPositiveSynergy")}</p>
           ) : (
             <ul style={{ paddingLeft: 18, margin: 0 }}>
               {positive.map((s, i) => (
@@ -84,9 +83,9 @@ export function Connections({
           )}
         </div>
         <div className="card">
-          <h3 className="loss">{COPY.negativeSynergy}</h3>
+          <h3 className="loss">{t("connections.negativeSynergy")}</h3>
           {negative.length === 0 ? (
-            <p className="muted">Negatif sinerji bulunamadı.</p>
+            <p className="muted">{t("connections.noNegativeSynergy")}</p>
           ) : (
             <ul style={{ paddingLeft: 18, margin: 0 }}>
               {negative.map((s, i) => (

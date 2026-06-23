@@ -3,6 +3,7 @@ import type { Match, TrackedUser } from "@/types/riot";
 import { championLeaderboard } from "@/lib/analysis";
 import { ChampBadge } from "./ChampBadge";
 import { num, pct } from "@/lib/format";
+import { useTranslation } from "@/lib/i18n";
 
 type ChampionLeaderboardProps = {
   users: TrackedUser[];
@@ -11,6 +12,7 @@ type ChampionLeaderboardProps = {
 
 export const ChampionLeaderboard = (props: ChampionLeaderboardProps) => {
   const { users, matches } = props;
+  const { t } = useTranslation();
   const [q, setQ] = useState("");
   const [championSort, setChampionSort] = useState<"games" | "alphabetical" | "players" | "winRate">("games");
   const [playerSortBy, setPlayerSortBy] = useState<"winRate" | "games" | "kda">("winRate");
@@ -62,22 +64,22 @@ export const ChampionLeaderboard = (props: ChampionLeaderboardProps) => {
     <div>
       <div className="row" style={{ justifyContent: "space-between", marginBottom: 16 }}>
         <div>
-          <h2>Şampiyon bazlı sıralama</h2>
+          <h2>{t("championLeaderboard.title")}</h2>
           <p className="muted" style={{ marginTop: -8 }}>
-            Her şampiyonun altında, o şampiyonu oynayan oyuncular başarılarına göre sıralanır.
+            {t("championLeaderboard.subtitle")}
           </p>
         </div>
         <div className="row" style={{ gap: 12 }}>
           <label className="row" style={{ gap: 6 }}>
-            <span className="muted">Şampiyon Sıralaması:</span>
+            <span className="muted">{t("championLeaderboard.champSort")}</span>
             <select
               value={championSort}
               onChange={(e) => setChampionSort(e.target.value as any)}
             >
-              <option value="games">Toplam Maç</option>
-              <option value="winRate">En Yüksek WR (Oyuncu)</option>
-              <option value="players">Oyuncu Sayısı</option>
-              <option value="alphabetical">Alfabetik</option>
+              <option value="games">{t("championLeaderboard.totalGames")}</option>
+              <option value="winRate">{t("championLeaderboard.highestWrGamer")}</option>
+              <option value="players">{t("championLeaderboard.playerCount")}</option>
+              <option value="alphabetical">{t("championLeaderboard.alphabeticalSort")}</option>
             </select>
           </label>
         </div>
@@ -85,17 +87,17 @@ export const ChampionLeaderboard = (props: ChampionLeaderboardProps) => {
 
       <div className="row" style={{ marginBottom: 16 }}>
         <input
-          placeholder="Şampiyon ara…"
+          placeholder={t("championLeaderboard.searchPlaceholder")}
           value={q}
           onChange={(e) => setQ(e.target.value)}
           style={{ width: 240 }}
         />
         <span className="muted" style={{ fontSize: 12 }}>
-          * Tablo başlıklarına (<strong>Maç, WR, KDA</strong>) tıklayarak oyuncuları sıralayabilirsin.
+          {t("championLeaderboard.searchTip")}
         </span>
       </div>
 
-      {filteredRows.length === 0 && <div className="empty">Veri yok.</div>}
+      {filteredRows.length === 0 && <div className="empty">{t("championLeaderboard.noData")}</div>}
 
       <div className="grid cols-2">
         {filteredRows.map((row) => (
@@ -103,33 +105,33 @@ export const ChampionLeaderboard = (props: ChampionLeaderboardProps) => {
             <ChampBadge
               championId={row.championId}
               name={row.championName}
-              sub={`${row.entries.length} oyuncu oynadı`}
+              sub={t("championLeaderboard.playedCount", { count: row.entries.length })}
             />
             <table style={{ marginTop: 10 }}>
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Oyuncu</th>
+                  <th>{t("championLeaderboard.player")}</th>
                   <th
                     style={{ cursor: "pointer", color: playerSortBy === "games" ? "var(--accent)" : undefined }}
                     onClick={() => setPlayerSortBy("games")}
-                    title="Toplam maça göre sırala"
+                    title="Total matches sorting"
                   >
-                    Maç {playerSortBy === "games" && "▼"}
+                    {t("championLeaderboard.games")} {playerSortBy === "games" && "▼"}
                   </th>
                   <th
                     style={{ cursor: "pointer", color: playerSortBy === "winRate" ? "var(--accent)" : undefined }}
                     onClick={() => setPlayerSortBy("winRate")}
-                    title="Win Rate'e göre sırala"
+                    title="Win Rate sorting"
                   >
-                    WR {playerSortBy === "winRate" && "▼"}
+                    {t("championLeaderboard.wr")} {playerSortBy === "winRate" && "▼"}
                   </th>
                   <th
                     style={{ cursor: "pointer", color: playerSortBy === "kda" ? "var(--accent)" : undefined }}
                     onClick={() => setPlayerSortBy("kda")}
-                    title="KDA'ya göre sırala"
+                    title="KDA sorting"
                   >
-                    KDA {playerSortBy === "kda" && "▼"}
+                    {t("championLeaderboard.kda")} {playerSortBy === "kda" && "▼"}
                   </th>
                 </tr>
               </thead>

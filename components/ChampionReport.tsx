@@ -3,7 +3,8 @@ import type { Match, TrackedUser } from "@/types/riot";
 import { userChampReport, ChampStat } from "@/lib/analysis";
 import { ChampBadge } from "./ChampBadge";
 import { num, pct } from "@/lib/format";
-import { COPY, wrRoast } from "@/lib/humor";
+import { wrRoast } from "@/lib/humor";
+import { useTranslation } from "@/lib/i18n";
 
 type ChampMiniProps = {
   label: string;
@@ -13,11 +14,12 @@ type ChampMiniProps = {
 
 const ChampMini = (props: ChampMiniProps) => {
   const { label, stat, good } = props;
+  const { t } = useTranslation();
   if (!stat)
     return (
       <div>
         <div className="muted" style={{ fontSize: 12 }}>{label}</div>
-        <div className="muted">yeterli maç yok</div>
+        <div className="muted">{t("championReport.noMatches")}</div>
       </div>
     );
   return (
@@ -29,10 +31,10 @@ const ChampMini = (props: ChampMiniProps) => {
         championId={stat.championId}
         name={stat.championName}
         small
-        sub={`${pct(stat.winRate)} WR · ${num(stat.avgKda, 2)} KDA · ${stat.games} maç`}
+        sub={`${pct(stat.winRate)} WR · ${num(stat.avgKda, 2)} KDA · ${stat.games} ${t("championReport.games").toLowerCase()}`}
       />
       <div className="muted" style={{ fontSize: 11, marginTop: 4 }}>
-        “{wrRoast(stat.winRate, stat.games)}”
+        “{wrRoast(stat.winRate, stat.games, t)}”
       </div>
     </div>
   );
@@ -44,6 +46,7 @@ type PlayerChampTableProps = {
 
 const PlayerChampTable = (props: PlayerChampTableProps) => {
   const { champs } = props;
+  const { t } = useTranslation();
   const [sortBy, setSortBy] = useState<"name" | "games" | "winRate" | "kda">("games");
   const [ascending, setAscending] = useState(false);
 
@@ -80,16 +83,16 @@ const PlayerChampTable = (props: PlayerChampTableProps) => {
       <thead>
         <tr>
           <th style={{ cursor: "pointer" }} onClick={() => handleSort("name")}>
-            Şampiyon {sortBy === "name" && (ascending ? "▲" : "▼")}
+            {t("championReport.champ")} {sortBy === "name" && (ascending ? "▲" : "▼")}
           </th>
           <th style={{ cursor: "pointer" }} onClick={() => handleSort("games")}>
-            Maç {sortBy === "games" && (ascending ? "▲" : "▼")}
+            {t("championReport.games")} {sortBy === "games" && (ascending ? "▲" : "▼")}
           </th>
           <th style={{ cursor: "pointer" }} onClick={() => handleSort("winRate")}>
-            WR {sortBy === "winRate" && (ascending ? "▲" : "▼")}
+            {t("championReport.wr")} {sortBy === "winRate" && (ascending ? "▲" : "▼")}
           </th>
           <th style={{ cursor: "pointer" }} onClick={() => handleSort("kda")}>
-            KDA {sortBy === "kda" && (ascending ? "▲" : "▼")}
+            {t("championReport.kda")} {sortBy === "kda" && (ascending ? "▲" : "▼")}
           </th>
         </tr>
       </thead>
@@ -109,12 +112,12 @@ const PlayerChampTable = (props: PlayerChampTableProps) => {
   );
 };
 
-function getGamerTier(winRate: number, totalGames: number) {
-  if (totalGames === 0) return { label: "UNRANKED", className: "tier-ur", desc: "Henüz maçı yok" };
-  if (totalGames < 3) return { label: "ÇIRAK", className: "tier-apprentice", desc: "Gelişmekte olan oyuncu" };
-  if (winRate > 0.55) return { label: "S+ ALLAH", className: "tier-god", desc: "İlah gibi oynuyor, flexin efendisi" };
-  if (winRate >= 0.50) return { label: "A CARRY", className: "tier-carry", desc: "Sırtlayıcı güç, güvenli liman" };
-  return { label: "F MAL", className: "tier-feeder", desc: "Takıma yük olan, feedleyen mal" };
+function getGamerTier(winRate: number, totalGames: number, t: (path: string) => string) {
+  if (totalGames === 0) return { label: t("championReport.tiers.unranked.label"), className: "tier-ur", desc: t("championReport.tiers.unranked.desc") };
+  if (totalGames < 3) return { label: t("championReport.tiers.apprentice.label"), className: "tier-apprentice", desc: t("championReport.tiers.apprentice.desc") };
+  if (winRate > 0.55) return { label: t("championReport.tiers.god.label"), className: "tier-god", desc: t("championReport.tiers.god.desc") };
+  if (winRate >= 0.50) return { label: t("championReport.tiers.carry.label"), className: "tier-carry", desc: t("championReport.tiers.carry.desc") };
+  return { label: t("championReport.tiers.feeder.label"), className: "tier-feeder", desc: t("championReport.tiers.feeder.desc") };
 }
 
 type ChampionReportProps = {
@@ -124,6 +127,7 @@ type ChampionReportProps = {
 
 export const ChampionReport = (props: ChampionReportProps) => {
   const { users, matches } = props;
+  const { t } = useTranslation();
   const [playerSort, setPlayerSort] = useState<"games" | "winRate" | "bestWr" | "name">("winRate");
 
   const reports = useMemo(() => {
@@ -159,28 +163,28 @@ export const ChampionReport = (props: ChampionReportProps) => {
     <div>
       <div className="row" style={{ justifyContent: "space-between", marginBottom: 16 }}>
         <div>
-          <h2>Kim neyle tanrı, kim neyle besleme</h2>
+          <h2>{t("championReport.title")}</h2>
           <p className="muted" style={{ marginTop: -8 }}>
-            Winrate&apos;e göre (en az 2 maç oynanan şampiyonlar arasından).
+            {t("championReport.subtitle")}
           </p>
         </div>
         <label className="row" style={{ gap: 8 }}>
-          <span className="muted">Sıralama Ölçütü:</span>
+          <span className="muted">{t("championReport.sortBy")}</span>
           <select
             value={playerSort}
             onChange={(e) => setPlayerSort(e.target.value as any)}
           >
-            <option value="winRate">Genel Win Rate</option>
-            <option value="games">Toplam Flex Maçı</option>
-            <option value="bestWr">En İyi Şampiyon WR</option>
-            <option value="name">Alfabetik İsim</option>
+            <option value="winRate">{t("championReport.overallWr")}</option>
+            <option value="games">{t("championReport.totalMatches")}</option>
+            <option value="bestWr">{t("championReport.bestWr")}</option>
+            <option value="name">{t("championReport.alphabetical")}</option>
           </select>
         </label>
       </div>
 
       <div className="grid cols-2">
         {sortedReports.map((r) => {
-          const tier = getGamerTier(r.winRate, r.totalGames);
+          const tier = getGamerTier(r.winRate, r.totalGames, t);
           return (
             <div className="card gamer-card" key={r.user.puuid}>
               <div className="stat-line" style={{ alignItems: "center" }}>
@@ -224,13 +228,13 @@ export const ChampionReport = (props: ChampionReportProps) => {
                   flexWrap: "wrap",
                 }}
               >
-                <ChampMini label={COPY.bestChamp} stat={r.best} good />
-                <ChampMini label={COPY.worstChamp} stat={r.worst} good={false} />
+                <ChampMini label={t("championReport.bestChamp")} stat={r.best} good />
+                <ChampMini label={t("championReport.worstChamp")} stat={r.worst} good={false} />
               </div>
               {r.champs.length > 0 && (
                 <details style={{ marginTop: 14 }}>
                   <summary className="muted" style={{ cursor: "pointer", fontWeight: 600 }}>
-                    Tüm şampiyonlar ({r.champs.length}) — tıklanabilir sıralama
+                    {t("championReport.allChampions", { count: r.champs.length })}
                   </summary>
                   <PlayerChampTable champs={r.champs} />
                 </details>

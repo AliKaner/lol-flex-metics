@@ -4,8 +4,10 @@ import { useState } from "react";
 import { useUsers, usersStore } from "@/lib/usersStore";
 import { useAddUser } from "@/hooks/useAddUser";
 import { PLATFORMS } from "@/lib/regions";
+import { useTranslation } from "@/lib/i18n";
 
 export function UserManager() {
+  const { t } = useTranslation();
   const users = useUsers();
   const [riotId, setRiotId] = useState("");
   const [platform, setPlatform] = useState("euw1");
@@ -22,16 +24,15 @@ export function UserManager() {
 
   return (
     <div className="panel">
-      <h2>Oyuncular</h2>
+      <h2>{t("userManager.title")}</h2>
       <p className="muted" style={{ marginTop: -8 }}>
-        İstediğin kadar oyuncu ekle. Veriler tarayıcıda saklanır, aynı oyuncu
-        için tekrar tekrar istek atılmaz.
+        {t("userManager.subtitle")}
       </p>
 
       <form className="row" onSubmit={submit}>
         <input
           style={{ flex: "1 1 240px" }}
-          placeholder="Riot ID — örn: Faker#KR1"
+          placeholder={t("userManager.placeholder")}
           value={riotId}
           onChange={(e) => setRiotId(e.target.value)}
         />
@@ -43,7 +44,7 @@ export function UserManager() {
           ))}
         </select>
         <button type="submit" disabled={addUser.isPending}>
-          {addUser.isPending ? "Ekleniyor…" : "Ekle"}
+          {addUser.isPending ? t("userManager.adding") : t("userManager.add")}
         </button>
       </form>
 
@@ -65,7 +66,7 @@ export function UserManager() {
               <button
                 className="danger"
                 onClick={() => usersStore.remove(u.puuid)}
-                title="Kaldır"
+                title={t("userManager.remove")}
               >
                 ✕
               </button>

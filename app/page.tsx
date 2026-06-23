@@ -12,20 +12,12 @@ import { Connections } from "@/components/Connections";
 import { Highlights } from "@/components/Highlights";
 import { TeamBuilder } from "@/components/TeamBuilder";
 import { GuessGame } from "@/components/GuessGame";
+import { useTranslation } from "@/lib/i18n";
 
-const TABS = [
-  { id: "report", label: "Tanrı mı, besleme mi" },
-  { id: "leaderboard", label: "Şampiyon sıralaması" },
-  { id: "combos", label: "Carry mi, sirk mi" },
-  { id: "connections", label: "Kim kimi taşıyor" },
-  { id: "highlights", label: "Efsane & utanç" },
-  { id: "team", label: "Takım kurucu" },
-  { id: "guess", label: "Who is that AGAmon" },
-] as const;
-
-type TabId = (typeof TABS)[number]["id"];
+type TabId = "report" | "leaderboard" | "combos" | "connections" | "highlights" | "team" | "guess";
 
 export default function Home() {
+  const { t, lang, setLang } = useTranslation();
   const users = useUsers();
   const [tab, setTab] = useState<TabId>("report");
   const [timeRange, setTimeRange] = useState<"1m" | "3m" | "all">("1m");
@@ -67,10 +59,10 @@ export default function Home() {
           window.localStorage.setItem("league-map-cache", JSON.stringify(backup.cache));
           window.location.reload();
         } else {
-          alert("Geçersiz yedek dosyası formatı!");
+          alert(t("page.invalidBackup"));
         }
       } catch (err) {
-        alert("Dosya okuma veya ayrıştırma hatası!");
+        alert(t("page.errorReadingFile"));
       }
     };
     reader.readAsText(file);
@@ -96,20 +88,47 @@ export default function Home() {
   // Takım kurucu maç verisi gerektirmez.
   const needsData = tab !== "team";
 
+  const tabs = [
+    { id: "report", label: t("page.tabs.report") },
+    { id: "leaderboard", label: t("page.tabs.leaderboard") },
+    { id: "combos", label: t("page.tabs.combos") },
+    { id: "connections", label: t("page.tabs.connections") },
+    { id: "highlights", label: t("page.tabs.highlights") },
+    { id: "team", label: t("page.tabs.team") },
+    { id: "guess", label: t("page.tabs.guess") },
+  ] as const;
+
   return (
     <div className="container">
-      <h1 className="site-title">
-        League <span>Map</span>
-      </h1>
-      <p className="subtitle">
-        Flex 5v5&apos;te kim tanrı kim besleme, ifşa zamanı.
+      <div className="row" style={{ justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <h1 className="site-title" style={{ margin: 0 }}>
+          {t("page.siteTitle")} <span>{t("page.siteTitleSpan")}</span>
+        </h1>
+        <button
+          onClick={() => setLang(lang === "tr" ? "en" : "tr")}
+          style={{
+            padding: "6px 12px",
+            fontSize: "12px",
+            background: "var(--panel-2)",
+            color: "var(--text)",
+            border: "1px solid var(--border)",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: 600,
+          }}
+        >
+          {lang === "tr" ? "🇺🇸 EN" : "🇹🇷 TR"}
+        </button>
+      </div>
+      <p className="subtitle" style={{ marginTop: -10 }}>
+        {t("page.subtitle")}
       </p>
 
       <UserManager />
 
       {!hasUsers ? (
         <div className="panel empty">
-          Başlamak için yukarıdan en az bir oyuncu ekle.
+          {t("page.startByAddingUser")}
         </div>
       ) : (
         <>
@@ -117,14 +136,14 @@ export default function Home() {
             <div className="row" style={{ justifyContent: "space-between" }}>
               <div className="row" style={{ gap: 16 }}>
                 <label className="row" style={{ gap: 8 }}>
-                  <span className="muted">Zaman Aralığı:</span>
+                  <span className="muted">{t("page.timeRange")}</span>
                   <select
                     value={timeRange}
                     onChange={(e) => setTimeRange(e.target.value as "1m" | "3m" | "all")}
                   >
-                    <option value="1m">Son 1 Ay (Hızlı)</option>
-                    <option value="3m">Son 3 Ay</option>
-                    <option value="all">Tüm Zamanlar</option>
+                    <option value="1m">{t("page.lastMonth")}</option>
+                    <option value="3m">{t("page.last3Months")}</option>
+                    <option value="all">{t("page.allTime")}</option>
                   </select>
                 </label>
                 <button
@@ -138,7 +157,7 @@ export default function Home() {
                     borderRadius: "6px"
                   }}
                 >
-                  {isLoading ? "Güncelleniyor..." : "🔄 Yenile"}
+                  {isLoading ? t("page.refreshing") : t("page.refresh")}
                 </button>
                 <button
                   onClick={handleExport}
@@ -150,9 +169,9 @@ export default function Home() {
                     border: "1px solid var(--border)",
                     borderRadius: "6px"
                   }}
-                  title="Tüm veri ve kullanıcı önbelleğini JSON olarak indir"
+                  title={t("page.exportTitle")}
                 >
-                  📥 Dışa Aktar
+                  {t("page.export")}
                 </button>
                 <label
                   style={{
@@ -166,9 +185,9 @@ export default function Home() {
                     display: "inline-flex",
                     alignItems: "center"
                   }}
-                  title="Yedek JSON dosyasını yükle"
+                  title={t("page.importTitle")}
                 >
-                  📤 İçe Aktar
+                  {t("page.import")}
                   <input
                     type="file"
                     accept=".json"
@@ -179,8 +198,8 @@ export default function Home() {
               </div>
               <span className="muted">
                 {isLoading
-                  ? `Maçlar yükleniyor… ${loaded}/${total}`
-                  : `${matches.length} flex maçı yüklendi`}
+                  ? t("page.loadingMatches", { loaded, total })
+                  : t("page.matchesLoaded", { count: matches.length })}
               </span>
             </div>
             {isLoading && total > 0 && (
@@ -190,13 +209,13 @@ export default function Home() {
             )}
             {error && (
               <p className="loss" style={{ marginTop: 8 }}>
-                {error} — dev API key&apos;in süresi dolmuş olabilir (.env.local).
+                {error} — {t("page.apiExpired")}
               </p>
             )}
           </div>
 
           <div className="tabs">
-            {TABS.map((t) => (
+            {tabs.map((t) => (
               <button
                 key={t.id}
                 className={`tab ${tab === t.id ? "active" : ""}`}
@@ -208,7 +227,7 @@ export default function Home() {
           </div>
 
           {needsData && isLoading && matches.length === 0 ? (
-            <div className="empty">Maç verileri yükleniyor…</div>
+            <div className="empty">{t("page.loadingMatchesLabel")}</div>
           ) : (
             <>
               {tab === "report" && <ChampionReport users={users} matches={matches} />}
@@ -228,8 +247,7 @@ export default function Home() {
       )}
 
       <footer className="muted" style={{ marginTop: 40, fontSize: 12 }}>
-        Veriler Riot Games API&apos;sinden gelir. League Map, Riot Games
-        tarafından onaylanmamıştır.
+        {t("page.footer")}
       </footer>
     </div>
   );

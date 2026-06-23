@@ -9,14 +9,14 @@ export function kdaStr(p: {
   return `${p.kills}/${p.deaths}/${p.assists}`;
 }
 
-export function timeAgo(ms: number): string {
+export function timeAgo(ms: number, t?: (path: string) => string): string {
   const diff = Date.now() - ms;
   const days = Math.floor(diff / 86400000);
-  if (days > 0) return `${days}g önce`;
+  if (days > 0) return `${days}${t ? t("common.daysAgo") : "g önce"}`;
   const hours = Math.floor(diff / 3600000);
-  if (hours > 0) return `${hours}sa önce`;
+  if (hours > 0) return `${hours}${t ? t("common.hoursAgo") : "sa önce"}`;
   const mins = Math.floor(diff / 60000);
-  return `${mins}dk önce`;
+  return `${mins}${t ? t("common.minsAgo") : "dk önce"}`;
 }
 
 export function duration(sec: number): string {

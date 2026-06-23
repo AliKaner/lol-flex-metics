@@ -5,6 +5,8 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { useState } from "react";
 
+import { LanguageProvider } from "@/lib/i18n";
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const [client] = useState(
     () =>
@@ -35,7 +37,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   // SSR sırasında persister yok; yine de QueryClient sağlanmalı, sadece
   // kalıcılaştırma (localStorage) istemcide devreye girer.
   if (!persister) {
-    return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+    return (
+      <QueryClientProvider client={client}>
+        <LanguageProvider>{children}</LanguageProvider>
+      </QueryClientProvider>
+    );
   }
 
   return (
@@ -48,7 +54,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         buster: "v1",
       }}
     >
-      {children}
+      <LanguageProvider>{children}</LanguageProvider>
     </PersistQueryClientProvider>
   );
 }

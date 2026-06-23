@@ -5,9 +5,10 @@ import type { Match, MatchParticipant, TrackedUser } from "@/types/riot";
 import { ratedMatchesForUser, kda, killParticipation, csPerMin } from "@/lib/analysis";
 import { ChampBadge } from "./ChampBadge";
 import { duration, kdaStr, num, timeAgo } from "@/lib/format";
-import { COPY } from "@/lib/humor";
+import { useTranslation } from "@/lib/i18n";
 
 function MatchRow({ match, p }: { match: Match; p: MatchParticipant }) {
+  const { t } = useTranslation();
   return (
     <div
       className="card"
@@ -23,7 +24,7 @@ function MatchRow({ match, p }: { match: Match; p: MatchParticipant }) {
           sub={`${p.teamPosition || ""} · ${duration(match.info.gameDuration)}`}
         />
         <span className={`badge ${p.win ? "win" : "loss"}`}>
-          {p.win ? "Galibiyet" : "Mağlubiyet"}
+          {p.win ? t("highlights.victoryLabel") : t("highlights.defeatLabel")}
         </span>
       </div>
       <div className="row" style={{ marginTop: 10, gap: 16 }}>
@@ -33,7 +34,7 @@ function MatchRow({ match, p }: { match: Match; p: MatchParticipant }) {
         </span>
         <span className="muted">KP {Math.round(killParticipation(match, p) * 100)}%</span>
         <span className="muted">CS/dk {num(csPerMin(match, p), 1)}</span>
-        <span className="muted">{timeAgo(match.info.gameCreation)}</span>
+        <span className="muted">{timeAgo(match.info.gameCreation, t)}</span>
       </div>
     </div>
   );
@@ -46,10 +47,11 @@ export function Highlights({
   users: TrackedUser[];
   matches: Match[];
 }) {
+  const { t } = useTranslation();
   const [puuid, setPuuid] = useState(users[0]?.puuid ?? "");
   const user = users.find((u) => u.puuid === puuid) ?? users[0];
 
-  if (!user) return <div className="empty">Önce oyuncu ekle.</div>;
+  if (!user) return <div className="empty">{t("highlights.emptyHighlights")}</div>;
 
   const rated = ratedMatchesForUser(matches, user.puuid);
   const best = rated.slice(0, 3);
@@ -57,10 +59,9 @@ export function Highlights({
 
   return (
     <div>
-      <h2>Efsane kareler & utanç müzesi</h2>
+      <h2>{t("highlights.title")}</h2>
       <p className="muted" style={{ marginTop: -8 }}>
-        Performans puanına göre (KDA, kill katılımı, CS/dk, sonuç, multikill).
-        Sadece flex 5v5.
+        {t("highlights.subtitle")}
       </p>
 
       <select
@@ -76,13 +77,13 @@ export function Highlights({
       </select>
 
       {rated.length === 0 ? (
-        <div className="empty">Bu oyuncu için flex 5v5 maçı yok.</div>
+        <div className="empty">{t("highlights.noMatchesUser")}</div>
       ) : (
         <div className="grid cols-2">
           <div>
-            <h3 className="win">{COPY.bestMatches}</h3>
+            <h3 className="win">{t("highlights.bestMatches")}</h3>
             <p className="muted" style={{ fontSize: 12, marginTop: -8 }}>
-              {COPY.bestMatchesSub}
+              {t("highlights.bestMatchesSub")}
             </p>
             <div className="grid">
               {best.map((r) => (
@@ -91,9 +92,9 @@ export function Highlights({
             </div>
           </div>
           <div>
-            <h3 className="loss">{COPY.worstMatches}</h3>
+            <h3 className="loss">{t("highlights.worstMatches")}</h3>
             <p className="muted" style={{ fontSize: 12, marginTop: -8 }}>
-              {COPY.worstMatchesSub}
+              {t("highlights.worstMatchesSub")}
             </p>
             <div className="grid">
               {worst.map((r) => (

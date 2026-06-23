@@ -2,25 +2,26 @@
 // Amaç: oyuncu jargonu, hafif dalga geçen ama gerçek küfür içermeyen ton.
 
 // Winrate'e göre takılan lakap.
-export function wrRoast(wr: number, games: number): string {
-  if (games < 2) return "daha yeni başlamış, dokunmayın";
-  if (wr >= 0.7) return "tanrı modu, smurf bunlar";
-  if (wr >= 0.55) return "fena değil reis";
-  if (wr >= 0.45) return "ne iyi ne kötü, ekmeğini yiyor";
-  if (wr >= 0.3) return "yük, takımı sırtında taşıtıyor";
-  return "besleme kral, en çok domalan";
+export function wrRoast(wr: number, games: number, t?: (path: string) => string): string {
+  if (games < 2) return t ? t("championReport.wrRoasts.newGamer") : "daha yeni başlamış, dokunmayın";
+  if (wr >= 0.7) return t ? t("championReport.wrRoasts.god") : "tanrı modu, smurf bunlar";
+  if (wr >= 0.55) return t ? t("championReport.wrRoasts.good") : "fena değil reis";
+  if (wr >= 0.45) return t ? t("championReport.wrRoasts.average") : "ne iyi ne kötü, ekmeğini yiyor";
+  if (wr >= 0.3) return t ? t("championReport.wrRoasts.bad") : "yük, takımı sırtında taşıtıyor";
+  return t ? t("championReport.wrRoasts.feeder") : "besleme kral, en çok domalan";
 }
 
 // KDA'ya göre takılan lakap.
-export function kdaRoast(kda: number): string {
-  if (kda >= 5) return "elinde silah var resmen";
-  if (kda >= 3) return "idare eder";
-  if (kda >= 1.5) return "ortalama bir fani";
-  if (kda >= 1) return "ölmeyi seviyor";
-  return "haritaya feed dağıtıyor";
+export function kdaRoast(kda: number, t?: (path: string) => string): string {
+  if (kda >= 5) return t ? t("championReport.kdaRoasts.god") : "elinde silah var resmen";
+  if (kda >= 3) return t ? t("championReport.kdaRoasts.good") : "idare eder";
+  if (kda >= 1.5) return t ? t("championReport.kdaRoasts.average") : "ortalama bir fani";
+  if (kda >= 1) return t ? t("championReport.kdaRoasts.bad") : "ölmeyi seviyor";
+  return t ? t("championReport.kdaRoasts.feeder") : "haritaya feed dağıtıyor";
 }
 
-// Sekme / başlık metinleri.
+// Not: Eski COPY ve GUESS_RIGHT/GUESS_WRONG değişkenleri geriye uyumluluk için duruyor,
+// ancak yeni kodlar translations.ts içindekileri kullanacaktır.
 export const COPY = {
   bestChamp: "TANRI OLDUĞU",
   worstChamp: "EN ÇOK DOMALDIĞI",
@@ -37,7 +38,6 @@ export const COPY = {
     "Hangi 3'lü / 5'li birlikte queue'ya girince ne oluyor? Carry mi, sirk mi?",
 };
 
-// Doğru/yanlış tahmin tepkileri.
 export const GUESS_WRONG = [
   "Yok artık, bu kadar mı tanımıyorsun?",
   "Tuttun tutturamadın. İpucu açıldı, daha kolay olamaz.",

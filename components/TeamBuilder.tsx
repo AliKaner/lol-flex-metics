@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { TrackedUser } from "@/types/riot";
+import { useTranslation } from "@/lib/i18n";
 
 const ROLES = ["TOP", "JUNGLE", "MID", "BOT", "SUPPORT"];
 
@@ -20,6 +21,7 @@ interface Slot {
 }
 
 export function TeamBuilder({ users }: { users: TrackedUser[] }) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set(users.map((u) => u.puuid))
   );
@@ -46,13 +48,13 @@ export function TeamBuilder({ users }: { users: TrackedUser[] }) {
   };
 
   if (users.length < 2)
-    return <div className="empty">Takım kurmak için en az 2 oyuncu ekle.</div>;
+    return <div className="empty">{t("teamBuilder.notEnoughUsersTeam")}</div>;
 
   return (
     <div>
-      <h2>Takım kurucu</h2>
+      <h2>{t("teamBuilder.title")}</h2>
       <p className="muted" style={{ marginTop: -8 }}>
-        Seçili oyuncuları rastgele iki takıma böler ve istersen rastgele rol atar.
+        {t("teamBuilder.subtitle")}
       </p>
 
       <div className="row" style={{ marginBottom: 12 }}>
@@ -71,7 +73,7 @@ export function TeamBuilder({ users }: { users: TrackedUser[] }) {
 
       <div className="row" style={{ marginBottom: 20 }}>
         <button onClick={generate} disabled={selected.size < 2}>
-          🎲 Rastgele eşle
+          {t("teamBuilder.shuffleTeams")}
         </button>
         <label className="row" style={{ gap: 6 }}>
           <input
@@ -80,7 +82,7 @@ export function TeamBuilder({ users }: { users: TrackedUser[] }) {
             onChange={(e) => setAssignRoles(e.target.checked)}
             style={{ width: 16 }}
           />
-          <span className="muted">Rol ata</span>
+          <span className="muted">{t("teamBuilder.assignRoles")}</span>
         </label>
       </div>
 
@@ -95,7 +97,7 @@ export function TeamBuilder({ users }: { users: TrackedUser[] }) {
               }}
             >
               <h3 style={{ color: side === "blue" ? "#3a8fd6" : "#f85149" }}>
-                {side === "blue" ? "Mavi Takım" : "Kırmızı Takım"}
+                {side === "blue" ? t("teamBuilder.blueTeam") : t("teamBuilder.redTeam")}
               </h3>
               {teams[side].map((s) => (
                 <div className="stat-line" key={s.user.puuid} style={{ padding: "4px 0" }}>
