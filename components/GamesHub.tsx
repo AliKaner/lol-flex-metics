@@ -3,9 +3,9 @@
 import { useState } from "react";
 import type { Match, TrackedUser } from "@/types/riot";
 import { useTranslation } from "@/lib/i18n";
-import { GuessGame } from "./GuessGame";
-import { MatchMatcher } from "./MatchMatcher";
-import { DamageDuel } from "./DamageDuel";
+import { GuessGame } from "@/components/GuessGame";
+import { MatchMatcher } from "@/components/MatchMatcher";
+import { DamageDuel } from "@/components/DamageDuel";
 
 type GameMode = "lobby" | "guess_player" | "guess_champ" | "matcher" | "duel";
 
