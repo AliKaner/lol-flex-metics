@@ -49,13 +49,14 @@ export function Highlights({
 }) {
   const { t } = useTranslation();
   const [puuid, setPuuid] = useState(users[0]?.puuid ?? "");
+  const [limit, setLimit] = useState<number>(3);
   const user = users.find((u) => u.puuid === puuid) ?? users[0];
 
   if (!user) return <div className="empty">{t("highlights.emptyHighlights")}</div>;
 
   const rated = ratedMatchesForUser(matches, user.puuid);
-  const best = rated.slice(0, 3);
-  const worst = rated.slice(-3).reverse();
+  const best = rated.slice(0, limit);
+  const worst = rated.slice(-limit).reverse();
 
   return (
     <div>
@@ -64,17 +65,36 @@ export function Highlights({
         {t("highlights.subtitle")}
       </p>
 
-      <select
-        value={user.puuid}
-        onChange={(e) => setPuuid(e.target.value)}
-        style={{ marginBottom: 16 }}
-      >
-        {users.map((u) => (
-          <option key={u.puuid} value={u.puuid}>
-            {u.gameName}#{u.tagLine}
-          </option>
-        ))}
-      </select>
+      <div className="panel flex-wrap" style={{ gap: 16, marginBottom: 20 }}>
+        <label className="row" style={{ gap: 8 }}>
+          <span className="muted">{t("highlights.playerLabel")}</span>
+          <select
+            value={user.puuid}
+            onChange={(e) => setPuuid(e.target.value)}
+          >
+            {users.map((u) => (
+              <option key={u.puuid} value={u.puuid}>
+                {u.gameName}#{u.tagLine}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="row" style={{ gap: 8 }}>
+          <span className="muted">{t("highlights.limitLabel")}</span>
+          <select
+            value={limit}
+            onChange={(e) => setLimit(Number(e.target.value))}
+          >
+            <option value={3}>3</option>
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+            <option value={1000}>{t("highlights.allOption")}</option>
+          </select>
+        </label>
+      </div>
 
       {rated.length === 0 ? (
         <div className="empty">{t("highlights.noMatchesUser")}</div>

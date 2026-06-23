@@ -12,9 +12,10 @@ import { Connections } from "@/components/Connections";
 import { Highlights } from "@/components/Highlights";
 import { TeamBuilder } from "@/components/TeamBuilder";
 import { GamesHub } from "@/components/GamesHub";
+import { TrendAnalysis } from "@/components/TrendAnalysis";
 import { useTranslation } from "@/lib/i18n";
 
-type TabId = "report" | "leaderboard" | "combos" | "connections" | "highlights" | "team" | "games";
+type TabId = "report" | "leaderboard" | "combos" | "connections" | "highlights" | "team" | "games" | "trends";
 
 export default function Home() {
   const { t, lang, setLang } = useTranslation();
@@ -96,6 +97,7 @@ export default function Home() {
     { id: "highlights", label: t("page.tabs.highlights") },
     { id: "team", label: t("page.tabs.team") },
     { id: "games", label: t("page.tabs.games") },
+    { id: "trends", label: t("page.tabs.trends") },
   ] as const;
 
   return (
@@ -240,6 +242,7 @@ export default function Home() {
               {tab === "highlights" && <Highlights users={users} matches={matches} />}
               {tab === "team" && <TeamBuilder users={users} />}
               {tab === "games" && <GamesHub users={users} matches={matches} />}
+              {tab === "trends" && <TrendAnalysis users={users} matches={matches} />}
             </>
           )}
         </>
