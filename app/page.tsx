@@ -20,7 +20,7 @@ export default function Home() {
   const { t, lang, setLang } = useTranslation();
   const users = useUsers();
   const [tab, setTab] = useState<TabId>("report");
-  const [timeRange, setTimeRange] = useState<"1m" | "3m" | "all">("1m");
+  const [timeRange, setTimeRange] = useState<"today" | "all">("all");
   const matchCount = 100;
 
   const queryClient = useQueryClient();
@@ -69,11 +69,10 @@ export default function Home() {
   };
 
   const startTime = useMemo(() => {
-    if (timeRange === "1m") {
-      return Math.floor((Date.now() - 30 * 24 * 60 * 60 * 1000) / 1000);
-    }
-    if (timeRange === "3m") {
-      return Math.floor((Date.now() - 90 * 24 * 60 * 60 * 1000) / 1000);
+    if (timeRange === "today") {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return Math.floor(today.getTime() / 1000);
     }
     // Season 2026 Start: Jan 8, 2026
     return Math.floor(new Date("2026-01-08T00:00:00Z").getTime() / 1000);
@@ -140,11 +139,10 @@ export default function Home() {
                   <span className="muted">{t("page.timeRange")}</span>
                   <select
                     value={timeRange}
-                    onChange={(e) => setTimeRange(e.target.value as "1m" | "3m" | "all")}
+                    onChange={(e) => setTimeRange(e.target.value as "today" | "all")}
                   >
-                    <option value="1m">{t("page.lastMonth")}</option>
-                    <option value="3m">{t("page.last3Months")}</option>
                     <option value="all">{t("page.allTime")}</option>
+                    <option value="today">{t("page.today")}</option>
                   </select>
                 </label>
                 <button

@@ -3,7 +3,7 @@ import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "League Map — Flex 5v5 Analizi",
+  title: "lol-flex-metics — Flex 5v5 Analizi",
   description: "Takip ettiğin oyuncuların flex 5v5 maçlarını analiz et.",
 };
 

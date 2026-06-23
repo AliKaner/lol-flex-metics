@@ -1,4 +1,4 @@
-# League Map 🗺️
+# lol-flex-metics 🗺️
 
 Takip ettiğin oyuncuların **flex 5v5 (queue 440)** maçlarını analiz eden,
 Next.js + React Query ile yazılmış bir web uygulaması. Tüm metinler hafif

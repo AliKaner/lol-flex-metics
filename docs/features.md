@@ -1,9 +1,9 @@
-# 🗺️ League Map - Detaylı Özellik Dökümantasyonu (Feature Spec)
+# 🗺️ lol-flex-metics - Detaylı Özellik Dökümantasyonu (Feature Spec)
 
-Bu dökümanda, **League Map** projesinde yer alan tüm özellikler (features), hesaplama metrikleri, arka planda dönen mantık ve uygulanan Türkçe oyuncu mizahı detaylı bir şekilde açıklanmıştır.
+Bu dökümanda, **lol-flex-metics** projesinde yer alan tüm özellikler (features), hesaplama metrikleri, arka planda dönen mantık ve uygulanan Türkçe oyuncu mizahı detaylı bir şekilde açıklanmıştır.
 
 ## 🚀 Genel Bakış
-League Map; takip ettiğiniz oyuncuların **flex 5v5 (queue 440)** maçlarını Riot API üzerinden çekip analiz eden, **Next.js + React Query** kullanılarak geliştirilmiş modern bir web uygulamasıdır. 
+lol-flex-metics; takip ettiğiniz oyuncuların **flex 5v5 (queue 440)** maçlarını Riot API üzerinden çekip analiz eden, **Next.js + React Query** kullanılarak geliştirilmiş modern bir web uygulamasıdır. 
 Tüm analiz sonuçları ve kullanıcı arayüzü metinleri, LoL jargonunu yansıtan hafif alaycı ve eğlenceli bir Türkçe üslup ile sunulmaktadır.
 
 ---
