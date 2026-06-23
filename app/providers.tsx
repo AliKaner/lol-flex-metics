@@ -1,6 +1,6 @@
 "use client";
 
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { useState } from "react";
@@ -32,9 +32,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         })
   );
 
-  // SSR sırasında persister yok; sadece istemcide kalıcılaştır.
+  // SSR sırasında persister yok; yine de QueryClient sağlanmalı, sadece
+  // kalıcılaştırma (localStorage) istemcide devreye girer.
   if (!persister) {
-    return <>{children}</>;
+    return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
   }
 
   return (
