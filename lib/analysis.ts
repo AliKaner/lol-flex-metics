@@ -226,6 +226,62 @@ export function combinations<T>(arr: T[], k: number): T[][] {
   return res;
 }
 
+// ----------------- ikili sinerji (bağlantılar) -----------------
+
+export interface PairSynergy {
+  a: TrackedUser;
+  b: TrackedUser;
+  games: number; // aynı takımda birlikte oynadıkları maç sayısı
+  wins: number;
+  togetherWR: number;
+  baseWR: number; // iki oyuncunun genel takım winrate ortalaması
+  lift: number; // togetherWR - baseWR  (+ iyi, - kötü)
+  enough: boolean; // minimum maç eşiğini geçti mi
+}
+
+function overallWinRate(matches: Match[], puuid: string): number {
+  const parts = userParticipations(matches, puuid);
+  if (parts.length === 0) return 0;
+  return parts.filter(({ p }) => p.win).length / parts.length;
+}
+
+// Tüm oyuncu çiftleri için "birlikte olunca winrate ne kadar değişiyor" analizi.
+export function pairSynergies(
+  users: TrackedUser[],
+  matches: Match[],
+  minGames = 3
+): PairSynergy[] {
+  const baseWR = new Map(users.map((u) => [u.puuid, overallWinRate(matches, u.puuid)]));
+  const out: PairSynergy[] = [];
+
+  for (const [a, b] of combinations(users, 2)) {
+    let games = 0;
+    let wins = 0;
+    for (const match of matches) {
+      const pa = findParticipant(match, a.puuid);
+      const pb = findParticipant(match, b.puuid);
+      if (!pa || !pb || pa.teamId !== pb.teamId) continue;
+      games++;
+      if (pa.win) wins++;
+    }
+    if (games === 0) continue;
+    const togetherWR = wins / games;
+    const base = ((baseWR.get(a.puuid) ?? 0) + (baseWR.get(b.puuid) ?? 0)) / 2;
+    out.push({
+      a,
+      b,
+      games,
+      wins,
+      togetherWR,
+      baseWR: base,
+      lift: togetherWR - base,
+      enough: games >= minGames,
+    });
+  }
+  out.sort((x, y) => y.lift - x.lift);
+  return out;
+}
+
 export interface ComboStat {
   members: TrackedUser[];
   games: number; // birlikte (aynı takımda) oynadıkları maç sayısı
