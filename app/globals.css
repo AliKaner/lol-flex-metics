@@ -263,20 +263,20 @@ button.danger:hover {
 /* Grid & Cards */
 .grid {
   display: grid;
-  gap: 18px;
+  gap: 24px;
 }
 .grid.cols-2 {
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
 }
 .grid.cols-3 {
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
 .card {
   background: var(--panel-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 18px;
+  padding: 26px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -541,4 +541,29 @@ footer {
   text-align: center;
   border-top: 1px solid var(--border);
   padding-top: 24px;
+}
+
+/* GAMIFIED CARDS CORNER */
+.game-select-card {
+  transition: var(--transition);
+  border: 1.5px solid var(--border);
+}
+.game-select-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: var(--accent-2);
+  box-shadow: 0 12px 30px rgba(0, 240, 255, 0.25);
+  background: linear-gradient(135deg, var(--panel-2-solid), rgba(0, 240, 255, 0.05)) !important;
+}
+
+.duel-player-card {
+  transition: var(--transition);
+}
+.duel-player-card:hover:not(.revealed) {
+  transform: translateY(-4px) scale(1.03);
+  border-color: var(--accent-2);
+  box-shadow: 0 8px 25px rgba(0, 240, 255, 0.15);
+}
+.duel-player-card.selected {
+  border-color: var(--accent-2) !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3) !important;
 }

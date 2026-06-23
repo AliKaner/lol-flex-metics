@@ -11,10 +11,10 @@ import { ComboAnalysis } from "@/components/ComboAnalysis";
 import { Connections } from "@/components/Connections";
 import { Highlights } from "@/components/Highlights";
 import { TeamBuilder } from "@/components/TeamBuilder";
-import { GuessGame } from "@/components/GuessGame";
+import { GamesHub } from "@/components/GamesHub";
 import { useTranslation } from "@/lib/i18n";
 
-type TabId = "report" | "leaderboard" | "combos" | "connections" | "highlights" | "team" | "guess";
+type TabId = "report" | "leaderboard" | "combos" | "connections" | "highlights" | "team" | "games";
 
 export default function Home() {
   const { t, lang, setLang } = useTranslation();
@@ -75,7 +75,8 @@ export default function Home() {
     if (timeRange === "3m") {
       return Math.floor((Date.now() - 90 * 24 * 60 * 60 * 1000) / 1000);
     }
-    return undefined;
+    // Season 2026 Start: Jan 8, 2026
+    return Math.floor(new Date("2026-01-08T00:00:00Z").getTime() / 1000);
   }, [timeRange]);
 
   const { matches, isLoading, loaded, total, error } = useMatchData(
@@ -95,7 +96,7 @@ export default function Home() {
     { id: "connections", label: t("page.tabs.connections") },
     { id: "highlights", label: t("page.tabs.highlights") },
     { id: "team", label: t("page.tabs.team") },
-    { id: "guess", label: t("page.tabs.guess") },
+    { id: "games", label: t("page.tabs.games") },
   ] as const;
 
   return (
@@ -240,7 +241,7 @@ export default function Home() {
               )}
               {tab === "highlights" && <Highlights users={users} matches={matches} />}
               {tab === "team" && <TeamBuilder users={users} />}
-              {tab === "guess" && <GuessGame users={users} matches={matches} />}
+              {tab === "games" && <GamesHub users={users} matches={matches} />}
             </>
           )}
         </>
