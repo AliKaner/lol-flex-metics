@@ -19,14 +19,16 @@ export interface MatchData {
 // aynı kullanıcı/maç için tekrar istek atılmaz.
 export function useMatchData(
   users: TrackedUser[],
-  matchCount = 40
+  matchCount = 40,
+  startTime?: number
 ): MatchData {
   // 1) Her kullanıcının maç ID listesi
   const idQueries = useQueries({
     queries: users.map((u) => ({
-      queryKey: ["matchIds", u.puuid, matchCount],
-      queryFn: () => getFlexMatchIds(u.region, u.puuid, matchCount),
+      queryKey: ["matchIds", u.puuid, matchCount, startTime],
+      queryFn: () => getFlexMatchIds(u.region, u.puuid, matchCount, startTime),
       enabled: !!u.puuid,
+      staleTime: Infinity, // Sadece kullanıcı manuel yenilediğinde istek atar
     })),
   });
 

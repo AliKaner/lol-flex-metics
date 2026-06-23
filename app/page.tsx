@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useUsers } from "@/lib/usersStore";
 import { useMatchData } from "@/hooks/useMatchData";
 import { UserManager } from "@/components/UserManager";
@@ -27,11 +28,68 @@ type TabId = (typeof TABS)[number]["id"];
 export default function Home() {
   const users = useUsers();
   const [tab, setTab] = useState<TabId>("report");
-  const [matchCount, setMatchCount] = useState(40);
+  const [timeRange, setTimeRange] = useState<"1m" | "3m" | "all">("1m");
+  const matchCount = 100;
+
+  const queryClient = useQueryClient();
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["matchIds"] });
+  };
+
+  const handleExport = () => {
+    if (typeof window === "undefined") return;
+    const usersData = window.localStorage.getItem("league-map-users") || "[]";
+    const cacheData = window.localStorage.getItem("league-map-cache") || "{}";
+    const backup = {
+      version: "1.0",
+      users: JSON.parse(usersData),
+      cache: JSON.parse(cacheData)
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `league-map-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (typeof window === "undefined") return;
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const backup = JSON.parse(event.target?.result as string);
+        if (backup && backup.users && backup.cache) {
+          window.localStorage.setItem("league-map-users", JSON.stringify(backup.users));
+          window.localStorage.setItem("league-map-cache", JSON.stringify(backup.cache));
+          window.location.reload();
+        } else {
+          alert("Geçersiz yedek dosyası formatı!");
+        }
+      } catch (err) {
+        alert("Dosya okuma veya ayrıştırma hatası!");
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const startTime = useMemo(() => {
+    if (timeRange === "1m") {
+      return Math.floor((Date.now() - 30 * 24 * 60 * 60 * 1000) / 1000);
+    }
+    if (timeRange === "3m") {
+      return Math.floor((Date.now() - 90 * 24 * 60 * 60 * 1000) / 1000);
+    }
+    return undefined;
+  }, [timeRange]);
 
   const { matches, isLoading, loaded, total, error } = useMatchData(
     users,
-    matchCount
+    matchCount,
+    startTime
   );
 
   const hasUsers = users.length > 0;
@@ -57,17 +115,68 @@ export default function Home() {
         <>
           <div className="panel">
             <div className="row" style={{ justifyContent: "space-between" }}>
-              <label className="row" style={{ gap: 8 }}>
-                <span className="muted">Oyuncu başına maç:</span>
-                <select
-                  value={matchCount}
-                  onChange={(e) => setMatchCount(Number(e.target.value))}
+              <div className="row" style={{ gap: 16 }}>
+                <label className="row" style={{ gap: 8 }}>
+                  <span className="muted">Zaman Aralığı:</span>
+                  <select
+                    value={timeRange}
+                    onChange={(e) => setTimeRange(e.target.value as "1m" | "3m" | "all")}
+                  >
+                    <option value="1m">Son 1 Ay (Hızlı)</option>
+                    <option value="3m">Son 3 Ay</option>
+                    <option value="all">Tüm Zamanlar</option>
+                  </select>
+                </label>
+                <button
+                  onClick={handleRefresh}
+                  disabled={isLoading}
+                  style={{
+                    padding: "6px 12px",
+                    fontSize: "12px",
+                    background: "var(--accent-2)",
+                    color: "#021014",
+                    borderRadius: "6px"
+                  }}
                 >
-                  {[10, 20, 40, 60, 80, 100].map((n) => (
-                    <option key={n} value={n}>{n}</option>
-                  ))}
-                </select>
-              </label>
+                  {isLoading ? "Güncelleniyor..." : "🔄 Yenile"}
+                </button>
+                <button
+                  onClick={handleExport}
+                  style={{
+                    padding: "6px 12px",
+                    fontSize: "12px",
+                    background: "var(--panel-2)",
+                    color: "var(--text)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "6px"
+                  }}
+                  title="Tüm veri ve kullanıcı önbelleğini JSON olarak indir"
+                >
+                  📥 Dışa Aktar
+                </button>
+                <label
+                  style={{
+                    padding: "6px 12px",
+                    fontSize: "12px",
+                    background: "var(--panel-2)",
+                    color: "var(--text)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center"
+                  }}
+                  title="Yedek JSON dosyasını yükle"
+                >
+                  📤 İçe Aktar
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={handleImport}
+                    style={{ display: "none" }}
+                  />
+                </label>
+              </div>
               <span className="muted">
                 {isLoading
                   ? `Maçlar yükleniyor… ${loaded}/${total}`

@@ -1,15 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
+
 :root {
-  --bg: #0a0e14;
-  --panel: #121821;
-  --panel-2: #1a2230;
-  --border: #243044;
+  --bg: #060b13;
+  --panel: #0d1421;
+  --panel-2: #141c2c;
+  --border: #24344f;
   --text: #e6edf3;
   --muted: #8b98a9;
   --accent: #c89b3c; /* LoL altın */
-  --accent-2: #0596aa;
+  --accent-2: #00c8c8; /* Parlak Hextech Turkuaz */
   --win: #3fb950;
   --loss: #f85149;
-  --radius: 10px;
+  --radius: 12px;
 }
 
 * {
@@ -20,10 +22,10 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
+  background: radial-gradient(circle at top, #0e1a30 0%, #050912 100%);
+  background-attachment: fixed;
   color: var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    Helvetica, Arial, sans-serif;
+  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
   font-size: 14px;
   line-height: 1.5;
 }
@@ -282,4 +284,151 @@ th {
   display: flex;
   justify-content: space-between;
   font-variant-numeric: tabular-nums;
+}
+
+/* GAMIFIED THEME ADDITIONS */
+
+/* Gamer Tier Badges */
+.gamer-tier {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  text-align: center;
+}
+
+.tier-ur {
+  background: rgba(139, 152, 169, 0.1);
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+.tier-apprentice {
+  background: rgba(0, 200, 200, 0.1);
+  color: var(--accent-2);
+  border-color: rgba(0, 200, 200, 0.3);
+}
+
+.tier-god {
+  background: linear-gradient(135deg, rgba(200, 155, 60, 0.25), rgba(255, 215, 0, 0.15));
+  color: #ffcc4d;
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(200, 155, 60, 0.45);
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+.tier-carry {
+  background: linear-gradient(135deg, rgba(0, 200, 200, 0.2), rgba(0, 255, 255, 0.1));
+  color: #00ffff;
+  border-color: var(--accent-2);
+  box-shadow: 0 0 10px rgba(0, 200, 200, 0.35);
+}
+
+.tier-average {
+  background: rgba(63, 185, 80, 0.1);
+  color: #58a6ff;
+  border-color: rgba(88, 166, 255, 0.3);
+}
+
+.tier-heavy {
+  background: rgba(232, 139, 48, 0.12);
+  color: #ff9f43;
+  border-color: rgba(232, 139, 48, 0.3);
+}
+
+.tier-feeder {
+  background: linear-gradient(135deg, rgba(248, 81, 73, 0.2), rgba(139, 0, 0, 0.1));
+  color: #ff6b6b;
+  border-color: var(--loss);
+  box-shadow: 0 0 10px rgba(248, 81, 73, 0.4);
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(200, 155, 60, 0.35);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(200, 155, 60, 0.65);
+    filter: brightness(1.1);
+  }
+}
+
+/* Win/Loss Split progress bar */
+.win-loss-container {
+  margin: 16px 0;
+  background: rgba(20, 28, 44, 0.5);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.win-loss-bar {
+  display: flex;
+  height: 10px;
+  background: #161b22;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.win-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2ea44f, #3fb950);
+}
+
+.loss-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #da3633, #f85149);
+}
+
+.win-loss-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Card Hover Animation Glows */
+.card {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 200, 200, 0.12);
+  border-color: rgba(0, 200, 200, 0.4);
+}
+
+.gamer-card:hover {
+  box-shadow: 0 8px 24px rgba(200, 155, 60, 0.12);
+  border-color: rgba(200, 155, 60, 0.4);
+}
+
+/* Titles and Navigation Polish */
+.site-title {
+  text-shadow: 0 0 15px rgba(0, 200, 200, 0.35);
+  font-weight: 800;
+}
+.site-title span {
+  text-shadow: 0 0 15px rgba(200, 155, 60, 0.35);
+}
+
+.tab {
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+table th {
+  user-select: none;
+  transition: color 0.15s ease;
+}
+table th:hover {
+  color: var(--text);
 }
